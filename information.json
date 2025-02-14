@@ -1,0 +1,107 @@
+{
+  "important_packages": [
+    {
+      "package_name": "ngspice",
+      "version": "ngspice-43",
+      "installed": "Yes",
+      "installed_date": "2025-02-14 11:35:58"
+    },
+    {
+      "package_name": "kicad",
+      "version": "8.0.8-0~ubuntu20.04.1",
+      "installed": "Yes",
+      "installed_date": "2025-02-14 11:28:10"
+    },
+    {
+      "package_name": "ghdl",
+      "version": "4.1.0",
+      "installed": "Yes",
+      "installed_date": "2025-02-14 11:50:20"
+    },
+    {
+      "package_name": "verilator",
+      "version": "verilator-5.020",
+      "installed": "Yes",
+      "installed_date": "2025-02-14 11:55:10"
+    }
+  ],
+  "pip_packages": [
+    {
+      "pip_package_name": "watchdog",
+      "version": "4.0.2"
+    },
+    {
+      "pip_package_name": "hdlparser",
+      "package_git_link": "https://github.com/hdl/pyhdlparser/tarball/master",
+      "version": "-"
+    },
+    {
+      "pip_package_name": "makerchip-app",
+      "version": "1.1.5"
+    },
+    {
+      "pip_package_name": "sandpiper-saas",
+      "version": "1.1.0"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependency_name": "xterm",
+      "version": "353-1ubuntu1.20.04.2"
+    },
+    {
+      "dependency_name": "python3-psutil",
+      "version": "6.1.1"
+    },
+    {
+      "dependency_name": "python3-pyqt5",
+      "version": "5.14.1"
+    },
+    {
+      "dependency_name": "python3-matplotlib",
+      "version": "3.1.2"
+    },
+    {
+      "dependency_name": "python3-distutils",
+      "version": "3.8.10-0ubuntu1~20.04"
+    },
+    {
+      "dependency_name": "python3-pip",
+      "version": "25.0"
+    }
+  ],
+  "nghdl_dependencies": [
+    {
+      "dependency_name": "make",
+      "version": "GNU Make 4.2.1"
+    },
+    {
+      "dependency_name": "gnat",
+      "version": "GNAT 10.5.0"
+    },
+    {
+      "dependency_name": "llvm",
+      "version": "16.0.6"
+    },
+    {
+      "dependency_name": "clang",
+      "version": "Ubuntu clang version 16.0.6 (++20231112100455+7cbf1a259152-1~exp1~20231112100542.106)"
+    },
+    {
+      "dependency_name": "zlib1g-dev",
+      "version": "1:1.2.11.dfsg-2ubuntu1.5"
+    },
+    {
+      "dependency_name": "libcanberra-gtk-module",
+      "version": "0.30-7ubuntu1"
+    },
+    {
+      "dependency_name": "libxaw7",
+      "version": "2:1.0.13-1"
+    },
+    {
+      "dependency_name": "libxaw7-dev",
+      "version": "2:1.0.13-1"
+    }
+  ]
+}
