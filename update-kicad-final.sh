@@ -70,7 +70,7 @@ updateKicad() {
 }
 
 update_kicad_json() {
-    json_file="information.json"
+    json_file="./information.json"
     kicad_version="$1"
     install_date=$(date '+%Y-%m-%d %H:%M:%S')
 
