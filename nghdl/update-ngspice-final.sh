@@ -80,7 +80,7 @@ function updateNGSPICE {
     
     if [[ -f "configure.ac" ]]; then
         echo "Regenerating configure script..."
-        sudo apt-get install -y libtool
+        sudo apt-get install -y libtool libreadline-dev
         libtoolize --force --copy
         aclocal
         autoheader

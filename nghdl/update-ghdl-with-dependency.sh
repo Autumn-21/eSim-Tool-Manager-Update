@@ -70,7 +70,10 @@ update_dependency() {
     sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${clang_version} 100
 
     echo "Installing additional dependencies..."
-    sudo apt install -y make zlib1g-dev libcanberra-gtk-module libcanberra-gtk3-module libxaw7 libxaw7-dev
+    sudo apt install -y make zlib1g-dev libcanberra-gtk-module libcanberra-gtk3-module libxaw7 libxaw7-dev build-essential g++ gcc libc++-dev libc++abi-dev libstdc++-10-dev
+
+    echo "Setting C++ include path explicitly..."
+    export CPLUS_INCLUDE_PATH=/usr/include/c++/12:/usr/include/x86_64-linux-gnu/c++/12:$CPLUS_INCLUDE_PATH
 
     echo "Dependency installation completed successfully!"
 
@@ -178,7 +181,8 @@ install_ghdl() {
         return 1
     }
 
-    cd ../..if ! command -v ghdl &>/dev/null; then
+    cd ../..
+    if ! command -v ghdl &>/dev/null; then
         echo "GHDL binary not found in PATH. Adding it now."
         export PATH=$PATH:/usr/local/bin
     fi
