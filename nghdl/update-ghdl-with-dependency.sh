@@ -178,11 +178,7 @@ install_ghdl() {
         return 1
     }
 
-    cd ../..
-
-    echo "ghdl-$ghdl_version installed successfully."
-
-    if ! command -v ghdl &>/dev/null; then
+    cd ../..if ! command -v ghdl &>/dev/null; then
         echo "GHDL binary not found in PATH. Adding it now."
         export PATH=$PATH:/usr/local/bin
     fi
@@ -195,6 +191,10 @@ install_ghdl() {
         echo "Error: GHDL was not installed correctly."
         return 1
     fi
+
+    echo "ghdl-$ghdl_version installed successfully."
+
+    
 }
 
 update_ghdl_json() {

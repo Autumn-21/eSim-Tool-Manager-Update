@@ -6,7 +6,6 @@ function update_ngspice_json {
     local json_file="../information.json"
 
     echo "Checking JSON file at: $json_file"
-    echo "Current directory: $(pwd)"
     
     if [[ -z "$ngspice_version" ]]; then
         echo "Error: NGSPICE version is empty. JSON not updated."
@@ -28,20 +27,23 @@ function update_ngspice_json {
 function updateNGSPICE {
     echo "Updating NGSPICE........................................"
     
-    # Define NGSPICE installation directory
     ngspice_dir="$HOME/$nghdl"
     package_dir="./nghdl/packages"
     local script_dir="$(cd "$(dirname "$0")" && pwd)"
     
-    # Remove previous NGSPICE installation if any
     echo "Removing previously installed NGSPICE (if any)"    
     sudo apt-get purge -y ngspice
     
-    # Create NGSPICE extraction directory in Home if not exists
+    echo "Installing required dependencies..."
+    sudo apt-get update
+    sudo apt-get install -y build-essential autoconf automake libtool \
+                            pkg-config bison flex libx11-dev libxaw7-dev \
+                            libreadline-dev libfftw3-dev libngspice0-dev \
+                            xorg-dev libjpeg-dev libpng-dev libfreetype6-dev
+    
     mkdir -p "$ngspice_dir"
     rm -rf "$ngspice_dir"/*
     
-    # Prompt user to select NGSPICE version
     versions=("ngspice-38.tar.gz" "ngspice-40.tar.gz" "ngspice-43.tar.gz")
     echo "Please choose an NGSPICE version to install:"
     echo "1) ngspice-38"
@@ -63,90 +65,72 @@ function updateNGSPICE {
         exit 1
     fi
     
-    # Extract NGSPICE to Home Directory
     temp_extract_dir="$HOME/temp_ngspice"
     rm -rf "$temp_extract_dir"
     mkdir -p "$temp_extract_dir"
-    tar -xzf "$package_dir/$version" -C "$temp_extract_dir"
+    tar -xzf "$package_dir/$version" -C "$temp_extract_dir" --strip-components=1
     
-    extracted_dir=$(find "$temp_extract_dir" -mindepth 1 -maxdepth 1 -type d | head -n 1)
+    mv "$temp_extract_dir"/* "$ngspice_dir"/
+    rm -rf "$temp_extract_dir"
     
-    if [[ -z "$extracted_dir" ]]; then
-        echo "Error: Extraction failed!"
+    cd "$ngspice_dir"
+    
+    mkdir -p install_dir
+    mkdir -p release
+    
+    if [[ -f "configure.ac" ]]; then
+        echo "Regenerating configure script..."
+        sudo apt-get install -y libtool
+        libtoolize --force --copy
+        aclocal
+        autoheader
+        automake --add-missing --foreign
+        autoconf
+        autoreconf -fi
+    else
+        echo "Error: configure.ac missing, cannot regenerate configure script."
         exit 1
     fi
     
-    # Handle nested directories by moving the contents
-    while [[ $(find "$extracted_dir" -mindepth 1 -maxdepth 1 -type d | wc -l) -eq 1 ]]; do
-        extracted_dir=$(find "$extracted_dir" -mindepth 1 -maxdepth 1 -type d | head -n 1)
-    done
-    
-    mv "$extracted_dir"/* "$ngspice_dir"/
-    rm -rf "$temp_extract_dir"
-    
-    # Change to NGSPICE directory
-    cd "$ngspice_dir"
-    
-    # Make local install and release directories
-    mkdir -p "$ngspice_dir/install_dir"
-    mkdir -p "$ngspice_dir/release"
-    cd "$ngspice_dir/release"
+    cd release
     
     echo "Configuring NGSPICE..........."
     sleep 2
     
-    if [[ ! -f "../configure" ]]; then
-        echo "'configure' script not found! Running autoreconf..."
-        cd "$ngspice_dir"
-        if [[ -f "configure.ac" ]]; then
-            autoreconf -fi
-        else
-            echo "Error: 'configure.ac' not found! Cannot generate configure script."
-            exit 1
-        fi
-        cd "$ngspice_dir/release"
-    fi
-    
     chmod +x ../configure
-    ../configure --enable-xspice --disable-debug --prefix="$ngspice_dir/install_dir/" --exec-prefix="$ngspice_dir/install_dir/"
+    ../configure --enable-xspice --disable-debug  --prefix="$ngspice_dir/install_dir/" --exec-prefix="$ngspice_dir/install_dir/"
+    
+    if [[ ! -f Makefile ]]; then
+        echo "Error: Makefile not generated, stopping."
+        exit 1
+    fi
     
     make -j$(nproc)
     make install
     
-    # Make it executable
-    if [[ ! -f "$ngspice_dir/install_dir/bin/ngspice" ]]; then
-        echo "Error: NGSPICE binary not found after installation!"
-        exit 1
-    fi
     sudo chmod 755 "$ngspice_dir/install_dir/bin/ngspice"
     
-    echo "NGSPICE updated successfully"
-    echo "Updating symlink for NGSPICE..."
+    echo "Removing previously installed Ngspice (if any)"    
+    sudo apt-get purge -y ngspice
     
-    # Remove old symlink and create new one
+    echo "NGSPICE updated successfully"
+    
     sudo rm -f /usr/bin/ngspice
     sudo ln -sf "$ngspice_dir/install_dir/bin/ngspice" /usr/bin/ngspice
     echo "Added softlink for NGSPICE....."
     
-    # Go back to script directory before updating JSON
     cd "$script_dir"
-    echo "Current directory before JSON update: $(pwd)"
-    
-    # Update JSON file
     ngspice_version=$(basename "$version" .tar.gz)
     update_ngspice_json "$ngspice_version"
-
-    # Add NGSPICE to PATH permanently
+    
     echo "Adding NGSPICE to PATH..."
     export PATH="$ngspice_dir/install_dir/bin:$PATH"
     echo 'export PATH="$HOME/nghdl-simulator/install_dir/bin:$PATH"' >> ~/.bashrc
     echo 'export PATH="$HOME/nghdl-simulator/install_dir/bin:$PATH"' >> ~/.profile
-
-    # Reload shell configuration to apply changes
+    
     source ~/.bashrc
     source ~/.profile
-
-    # Verify NGSPICE installation and display version
+    
     echo "Verifying NGSPICE installation..."
     if command -v ngspice &> /dev/null; then
         echo "NGSPICE successfully installed!"
